@@ -1,6 +1,8 @@
+package defaultpackage;
+
 import java.util.stream.IntStream;
 
-public class PorgramOne {
+public class ProgramOne {
 
 	public static void main(String[] args) {
 		// Imperative Style of programming
