@@ -3,8 +3,7 @@ package streams_terminal;
 import data.Student;
 import data.StudentDatabase;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -62,6 +61,36 @@ public class StreamsGroupingByExample {
                 .collect(Collectors.toMap(Student::getName,Student::getNotebooks));
     }
 
+    public static Map<String, Set<Student>> threeLevelGroupBy(){
+       return StudentDatabase.getAllStudents()
+                .stream()
+                .collect(Collectors.groupingBy(Student::getName, LinkedHashMap::new,Collectors.toSet()));
+    }
+
+
+    //This will return optional since maxBy return is Optional
+    public static Map<Integer,Optional<Student>> twoLevelGroupBy_4_calculatingTopLevelGpaStudentForEachGrade(){
+
+        return StudentDatabase.getAllStudents().stream()
+                .collect(Collectors.groupingBy(Student::getGradeLevel,
+                        Collectors.maxBy(Comparator.comparing(Student::getGpa))));
+    }
+
+    //To avoid optional in output there is collectingAndThen method with Collectors
+    public static Map<Integer,Student> twoLevelGroupBy_4_calculatingTopLevelGpaStudentForEachGrade_RemovingOptional(){
+
+        return StudentDatabase.getAllStudents().stream()
+                .collect(Collectors.groupingBy(Student::getGradeLevel,Collectors.collectingAndThen(
+                        Collectors.maxBy(Comparator.comparing(Student::getGpa)),Optional::get)));
+    }
+
+
+    public static Map<Integer,Student> twoLevelGroupBy_4_calculatingLowestGpaStudentForEachGrade_RemovingOptional(){
+
+        return StudentDatabase.getAllStudents().stream()
+                .collect(Collectors.groupingBy(Student::getGradeLevel,Collectors.collectingAndThen(
+                        Collectors.minBy(Comparator.comparing(Student::getGpa)),Optional::get)));
+    }
 
     public static void main(String[] args) {
 
@@ -77,6 +106,14 @@ public class StreamsGroupingByExample {
         System.out.println("GroupBy on Name with Notebooks : " + twoLevelGroupBy_3());
 
         System.out.println("Test : " + test());
+
+        System.out.println("Three level group by  : " + threeLevelGroupBy());
+
+        System.out.println("Top Gpa student for each Grade : " + twoLevelGroupBy_4_calculatingTopLevelGpaStudentForEachGrade());
+
+        System.out.println("Top Gpa student for each Grade removing Optional in Output : " + twoLevelGroupBy_4_calculatingTopLevelGpaStudentForEachGrade_RemovingOptional());
+
+        System.out.println("Lowest Gpa student for each Grade removing Optional in Output : " + twoLevelGroupBy_4_calculatingLowestGpaStudentForEachGrade_RemovingOptional());
 
     }
 }
